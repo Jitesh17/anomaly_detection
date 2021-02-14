@@ -14,7 +14,7 @@ from PIL import Image
 # from torch.autograd import Variable
 from torchvision.utils import save_image
 img_size = 64*2
-num_epochs = 100
+num_epochs = 200
 batch_size = 4
 learning_rate = 0.001
 threshold = 0.01
@@ -59,7 +59,7 @@ aug_seq = A.Compose([
 ])
 base = ""
 # base = "/home/jitesh/jg/anomaly_detection/"
-weight_dir_path = base + "weights/simple3"
+weight_dir_path = base + "weights/simple"
 writer = SummaryWriter(log_dir=os.path.join(weight_dir_path, "tb"))
 transform = tv.transforms.Compose([
     tv.transforms.ToTensor(),
