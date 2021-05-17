@@ -1,11 +1,16 @@
 import os
 import time
 
-from lib import *
+from .lib import *
 
 
 # path = base + f"data/washer/washer_ng/{folder}"
-def predict(path: str, weight_path: str, num_workers: int = 2, batch_size: int = 4, show_images: bool = True):
+def predict(
+    path: str, weight_path: str, threshold: float, 
+    num_workers: int = 2, batch_size: int = 4, 
+    show_images: bool = True, 
+    save_images: bool = True,
+    fname=''):
     """
     # Input
     - path: path of the image or directory of images to be tested
@@ -17,7 +22,7 @@ def predict(path: str, weight_path: str, num_workers: int = 2, batch_size: int =
     img_size = 128
     mean = std = [0.5]*3
     aug_seq = augment(img_size=img_size, mean=mean, std=std)
-    threshold = 0.008411495946347713
+    # threshold = 0.008411495946347713
     # threshold = 0.012
     if os.path.isfile(path):
         dataset = MyDataset([path], "", mode="test",
@@ -58,6 +63,7 @@ def predict(path: str, weight_path: str, num_workers: int = 2, batch_size: int =
         # print(f'labels:{labels}')
         # print(f'total:{sum(labels)}/{len(labels)}')
         # print(f'percent:{round(sum(labels)/len(labels)*100, 3)}%')
+        
     print(
         f"::::::::::::::::::::::{path.split('/')[-1]}:::::::::::::::::::::::::")
     # result[folder] = round(sum(all_labels)/len(all_labels)*100, 3)
@@ -138,7 +144,21 @@ def predict(path: str, weight_path: str, num_workers: int = 2, batch_size: int =
             #     ax.get_xaxis().set_visible(False)
             #     ax.get_yaxis().set_visible(False)
             #     i += 1
-            plt.show()
+            if save_images:
+                i = 0
+                if os.path.exists(fname + f"/{i}.png"):
+                    i += 1
+                filename = fname + f"/{i}.png"
+                fig.savefig(
+                    filename, dpi=None, facecolor='w', edgecolor='w',
+                    orientation='portrait', papertype=None, format=None,
+                    transparent=False, bbox_inches=None, pad_inches=0.1,
+                    frameon=None, metadata=None)
+            else:
+                plt.show()
+                
+    
+    return fig
 
 
 if __name__ == "__main__":
@@ -160,6 +180,7 @@ if __name__ == "__main__":
         predict(
             path=path,
             weight_path="/home/jitesh/jg/anomaly_detection/weights/simple2/1.pth",
+            threshold = 0.008411495946347713,
             batch_size=1,
             # show_images=False,
             )

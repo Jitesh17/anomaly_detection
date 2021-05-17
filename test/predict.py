@@ -88,7 +88,7 @@ def predict(path: str, weight_path: str, num_workers: int = 2, batch_size: int =
             #     ax.get_xaxis().set_visible(False)
             #     ax.get_yaxis().set_visible(False)
             #     i += 1
-            for img, ax in zip(fscore, axes[:, 2]):
+            for img, ax in zip(fscore, axes[:, i]):
                 im = tensor2np(img)
                 ax.imshow(np.dot(im[...,:3], [0.2989, 0.5870, 0.1140]))
                 ax.get_xaxis().set_visible(False)

@@ -139,7 +139,7 @@ def get_files(dirpath):
     return [os.path.join(dirpath, fn) for fn in os.listdir(dirpath)]
 
 
-def get_dataloader(path, batch_size, mode, shuffle, num_workers, img_size, mean, std):
+def get_dataloader(path, batch_size, mode, shuffle, num_workers, img_size, mean=[0.5]*3, std=[0.5]*3):
     files = get_files(path)
     dataset = MyDataset(files, "", mode=mode,
                         aug=augment(img_size, mean, std),

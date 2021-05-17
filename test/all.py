@@ -15,9 +15,9 @@ from PIL import Image
 # import cv2
 # from torch.autograd import Variable
 from torchvision.utils import save_image
-img_size = 64*2
+img_size = 400 #64*2
 num_epochs = 100
-batch_size = 4
+batch_size = 1
 learning_rate = 0.001
 threshold = 0.01
 mean = [0.485, 0.456, 0.406]
@@ -61,7 +61,7 @@ aug_seq = A.Compose([
 ])
 base = ""
 base = "/home/jitesh/jg/anomaly_detection/"
-weight_dir_path = base + "weights/simple2"
+weight_dir_path = base + "weights/fabric_01"
 writer = SummaryWriter(log_dir=os.path.join(weight_dir_path, "tb"))
 transform = tv.transforms.Compose([
     tv.transforms.ToTensor(),
@@ -269,7 +269,7 @@ for epoch in range(1, num_epochs+1):
     print('Epoch: {} \tTraining Loss: {:.6f}'.format(
         epoch, train_loss))
 
-filename_pth = f'1.pth'
+filename_pth = f'fabric_01.pth'
 torch.save(model.state_dict(), os.path.join(weight_dir_path, filename_pth))
 
 

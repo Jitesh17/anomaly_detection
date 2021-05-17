@@ -139,7 +139,7 @@ def get_files(dirpath):
     return [os.path.join(dirpath, fn) for fn in os.listdir(dirpath)]
 
 
-def get_dataloader(path, batch_size, mode, shuffle, num_workers, img_size, mean, std):
+def get_dataloader(path, batch_size, mode, shuffle, num_workers, img_size, mean=[0.5]*3, std=[0.5]*3):
     files = get_files(path)
     dataset = MyDataset(files, "", mode=mode,
                         aug=augment(img_size, mean, std),
@@ -201,3 +201,95 @@ class Autoencoder(nn.Module):
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:
         return param_group['lr']
+
+
+def make_figure(img):
+    im = tensor2np(img)
+    fig = plt.figure()
+    plt.imshow(im)
+    return fig
+
+
+def make_full_figure(images, output, batch_size, img_size):
+    images = images.cpu().numpy()
+    output = output.view(-1, 3, img_size, img_size)
+    output = output.clone().detach().cpu().numpy()
+    fscore = feature_score(images, output)
+    tp=100
+    iscore = instance_score(fscore, tp)
+    score = iscore
+    threshold = np.percentile(score, tp)
+    
+    ncols = 3*2
+    fig, axes = plt.subplots(nrows=batch_size, ncols=ncols,
+                                sharex=True, sharey=True, figsize=(3*ncols, 3*batch_size))
+    i = 0
+    if batch_size > 1:
+        axes[0, 0].set_title('image')
+        axes[0, 1].set_title('output')
+        axes[0, 2].set_title('heatmap')
+        axes[0, 3].set_title('heatmap (0)')
+        axes[0, 4].set_title('heatmap (1)')
+        axes[0, 5].set_title('heatmap (2)')
+        for img, ax in zip(images, axes[:, i]):
+            ax.imshow(tensor2np(img))
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+        i += 1
+        
+        for img, ax in zip(output, axes[:, i]):
+            ax.imshow(tensor2np(img))
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+        i += 1
+        for img, ax in zip(fscore, axes[:, i]):
+            ax.imshow(tensor2np(img))
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+        i += 1
+        for img, ax in zip(fscore, axes[:, i]):
+            ax.imshow(tensor2np(img)[:, :, 0])
+            # im = tensor2np(img)
+            # ax.imshow(np.dot(im[...,:3], [0.2989, 0.5870, 0.1140]))
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+        i += 1
+        
+        for img, ax in zip(fscore, axes[:, i]):
+            ax.imshow(tensor2np(img)[:, :, 1])
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+        i += 1
+        for img, ax in zip(fscore, axes[:, i]):
+            ax.imshow(tensor2np(img)[:, :, 2])
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+        i += 1
+    elif batch_size == 1:
+        axes[0].set_title('image')
+        axes[1].set_title('output')
+        for img, ax in zip(images, [axes[i]]):
+            ax.imshow(tensor2np(img))
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+            i += 1
+        for img, ax in zip(output, [axes[i]]):
+            ax.imshow(tensor2np(img))
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+            i += 1
+        # for img, ax in zip(fscore, [axes[i]]):
+        #     ax.imshow(tensor2np(img))
+        #     ax.get_xaxis().set_visible(False)
+        #     ax.get_yaxis().set_visible(False)
+        #     i += 1
+        for img, ax in zip(fscore, [axes[i]]):
+            im = tensor2np(img)
+            ax.imshow(np.dot(im[...,:3], [0.2989, 0.5870, 0.1140]))
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+            i += 1
+                
+    # plt.imshow(fig) 
+    # plt.show()  
+    return fig, [fscore, iscore, threshold]
